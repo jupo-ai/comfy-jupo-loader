@@ -9,7 +9,7 @@ def import_modules_from_directory(dirname: str):
     """指定されたディレクトリからモジュールを動的にインポートする"""
     dir_path = py_dir / dirname
     imported_modules = []
-    disabled_modules = {"modules": {"tag_complete"}}
+    disabled_modules = {}
     if not __package__:
         return imported_modules
     
