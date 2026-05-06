@@ -20,13 +20,13 @@ Comfy Jupo Loader は、ComfyUI のモデル・画像・プリミティブ値の
 
 ```bash
 cd ComfyUI/custom_nodes
-git clone <repository-url> comfy-jupo-loader
+git clone https://github.com/jupo-ai/comfy-jupo-loader.git
 ```
 
 追加依存関係をインストールします。
 
 ```bash
-pip install -r custom_nodes/comfy-jupo-loader/requirements.txt
+pip install -r comfy-jupo-loader/requirements.txt
 ```
 
 ComfyUI 標準の `requirements.txt` はインストール済みである前提です。このパッケージの `requirements.txt` には、追加で必要なものだけを記載しています。
