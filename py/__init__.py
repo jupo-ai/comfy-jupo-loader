@@ -8,6 +8,9 @@ EXTENSION_NAME = py_dir.parent.stem
 def import_modules_from_directory(dirname: str):
     """指定されたディレクトリからモジュールを動的にインポートする"""
     dir_path = py_dir / dirname
+    if not dir_path.exists():
+        return []
+    
     imported_modules = []
     disabled_modules = {}
     if not __package__:
