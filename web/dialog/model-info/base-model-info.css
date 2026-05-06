@@ -1,0 +1,635 @@
+/*
+=================================================
+Base Model Info
+=================================================
+*/
+/* --- 共通変数 --- */
+.jupo-model-info {
+    --text-status: rgb(74, 242, 199);
+    --text-status-error: rgb(255, 143, 157);
+
+    --text-size-section: 13px;
+    --text-size-section-header: 13px;
+}
+
+/* --- ウィンドウレイアウト --- */
+.jupo-model-info {
+    width: 60vw;
+    height: 90vh;
+    overflow-y: auto;
+}
+
+.jupo-model-info-content {
+    margin-top: calc(-1 * var(--toolbar-height));
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* --- ヘッダー --- */
+.jupo-model-info-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 12px;
+    gap: 8px;
+
+    border-bottom: 1px solid var(--dialog-border);
+    background-image: linear-gradient(to right, var(--dialog-bg-secondary), transparent);
+}
+
+.jupo-model-info-header-title {
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    word-break: break-all;
+}
+
+.jupo-model-info-header-status {
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--text-status);
+    opacity: 0.9;
+}
+
+.jupo-model-info-header-status--error {
+    color: var(--text-status-error);
+}
+
+/* --- ボディ --- */
+.jupo-model-info-body {
+    padding: 24px;
+
+    display: grid;
+    gap: 24px;
+    grid-template-columns: 50% 1fr;
+    grid-template-areas: 
+        "data-area preview-area"
+        "gallery-area gallery-area"
+        "trigger-area trigger-area";
+}
+
+
+/* --- data area --- */
+.jupo-model-info-data-area {
+    grid-area: data-area;
+
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* --- preview area --- */
+.jupo-model-info-preview-area {
+    grid-area: preview-area;
+}
+
+/* --- gallery area --- */
+.jupo-model-info-gallery-area {
+    grid-area: gallery-area;
+}
+
+/* --- trigger area --- */
+.jupo-model-info-trigger-area {
+    grid-area: trigger-area;
+}
+
+
+/*
+-------------------------------------------------
+Data Section
+-------------------------------------------------
+*/
+.jupo-data-section-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--accent-color);
+    font-size: var(--text-size-section-header);
+}
+
+.jupo-data-section-header > span {
+    color: var(--text-secondary);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.jupo-data-section-header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.jupo-data-section-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: var(--text-size-section);
+}
+
+.jupo-data-section-item {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 1px solid var(--dialog-border);
+    background-color: rgba(255, 255, 255, 0.02);
+    line-height: 1.5;
+    align-items: start;
+}
+
+.jupo-data-section-item-label {
+    color: var(--text-secondary);
+    font-weight: 600;
+    word-break: break-all;
+    text-transform: uppercase;
+    letter-spacing: 0.08rem;
+    width: 150px;
+}
+
+.jupo-data-section-item-value {
+    color: var(--text-primary);
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-width: 0;
+}
+
+.jupo-data-section-item > input, 
+.jupo-data-section-item > textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    outline: none;
+
+    color: var(--text-primary);
+    font-size: 14px;
+    letter-spacing: 0.02rem;
+    resize: vertical;
+}
+
+.jupo-data-section-item > input:focus, 
+.jupo-data-section-item > textarea:focus {
+    background-color: var(--input-bg-focus);
+    border-color: var(--input-border-focus);
+}
+
+
+/*
+-------------------------------------------------
+Preview Section
+-------------------------------------------------
+*/
+.jupo-preview-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border-radius: 12px;
+}
+
+.jupo-preview-section-media-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 300px;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: rgba(11, 15, 24, 0.6);
+}
+
+.jupo-preview-section-media {
+    max-width: 100%;
+    max-height: 450px;
+    object-fit: contain;
+}
+
+.jupo-preview-section-media--empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: var(--text-secondary);
+}
+
+.jupo-preview-section-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 12px;
+    gap: 12px;
+    border-top: 1px solid var(--dialog-border);
+}
+
+.jupo-preview-section-upload-button, 
+.jupo-preview-section-delete-button {
+    color: var(--text-primary);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: transform 0.1s, background-color 0.1s;
+}
+
+.jupo-preview-section-upload-button:active, 
+.jupo-preview-section-delete-button:active {
+    transform: translateY(1px);
+}
+
+.jupo-preview-section-upload-button {
+    background-color: var(--accent-color);
+}
+
+.jupo-preview-section-upload-button:hover {
+    background-color: var(--accent-hover);
+}
+
+.jupo-preview-section-delete-button {
+    background-color: var(--accent-error);
+}
+
+.jupo-preview-section-delete-button:hover {
+    background-color: var(--accent-error-hover);
+}
+
+
+/*
+-------------------------------------------------
+Gallery Section
+-------------------------------------------------
+*/
+.jupo-gallery-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.jupo-gallery-section-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--accent-color);
+    font-size: var(--text-size-section-header);
+}
+
+.jupo-gallery-section-header-title {
+    color: var(--text-secondary);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.jupo-gallery-section-header-counter {
+    position: relative;
+    display: inline-block;
+    color: var(--text-secondary);
+    font-weight: 600;
+    padding: 2px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--dialog-border);
+}
+
+.jupo-gallery-section-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 16px;
+    padding: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.jupo-gallery-section-item {
+    position: relative;
+    aspect-ratio: 2/3;
+    background-color: rgba(11, 15, 24, 0.6);
+    border: 1px solid var(--dialog-border);
+    border-radius: 10px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s, background-color 0.2s;
+    flex-shrink: 0;
+}
+
+.jupo-gallery-section-item:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-hover);
+    background-color: rgba(24, 28, 50, 0.75);
+}
+
+.jupo-gallery-section-item-media {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.2s;
+}
+
+.jupo-gallery-section-item:hover .jupo-gallery-section-item-media {
+    transform: scale(1.1);
+}
+
+.jupo-gallery-section-item-actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    justify-content: flex-end;
+    padding: 6px;
+    width: 100%;
+    z-index: 10;
+}
+
+.jupo-gallery-section-item-action {
+    background: rgba(0, 0, 0, 0.75);
+    border-radius: 8px;
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    border: 1px solid var(--dialog-border);
+    cursor: pointer;
+    opacity: 0;
+    color: var(--text-primary);
+}
+
+.jupo-gallery-section-item:hover .jupo-gallery-section-item-action {
+    opacity: 1;
+}
+
+.jupo-gallery-section-item-action:hover {
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+}
+
+.jupo-gallery-section-item--empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    min-height: 200px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 12px;
+    border: 2px dashed var(--dialog-border);
+}
+
+
+/*
+-------------------------------------------------
+Trigger Section
+-------------------------------------------------
+*/
+.jupo-trigger-section {
+    display: flex;
+    flex-direction: column;
+    font-size: var(--text-size-section);
+}
+
+.jupo-trigger-section-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--accent-color);
+    font-size: var(--text-size-section-header);
+}
+
+.jupo-trigger-section-header > span {
+    color: var(--text-secondary);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.jupo-trigger-section-header > button {
+    background-color: transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    padding: 2px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--dialog-border);
+}
+
+.jupo-trigger-section-header > button:hover {
+    background-color: var(--dialog-hover);
+}
+
+.jupo-trigger-section-header > button:active {
+    transform: translateY(1px);
+}
+
+.jupo-trigger-section-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 32px;
+}
+
+.jupo-trigger-section-button {
+    background: var(--accent-color);
+    color: var(--text-primary);
+    border: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.jupo-trigger-section-button:hover {
+    background-color: var(--accent-hover);
+}
+
+.jupo-trigger-section-button:active {
+    transform: translateY(1px);
+}
+
+.jupo-trigger-section-empty {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    text-align: center;
+    border: 2px dashed var(--dialog-border);
+    border-radius: 8px;
+}
+
+.jupo-trigger-section-textarea {
+    width: 100%;
+    min-height: 100px;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    margin-top: 16px;
+
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    outline: none;
+
+    color: var(--text-primary);
+    font-size: 14px;
+    letter-spacing: 0.02rem;
+    resize: vertical;
+}
+
+.jupo-trigger-section-textarea:focus {
+    background-color: var(--input-bg-focus);
+    border-color: var(--input-border-focus);
+}
+
+.jupo-trigger-section-textarea::placeholder {
+    letter-spacing: 0.08rem;
+    font-size: 14px;
+}
+
+
+
+/*
+=================================================
+Raw Data Dialog
+=================================================
+*/
+.jupo-data-dialog {
+    max-width: 80vw;
+    max-height: 90vh;
+}
+
+.jupo-data-dialog-content {
+    padding: 0 20px 20px 20px;
+
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.jupo-data-dialog-data {
+    margin: 0;
+    padding: 24px;
+    background-color: var(--input-bg);
+    border: 1px solid var(--dialog-border);
+    border-radius: 4px;
+
+    color: var(--text-primary);
+    font-family: "Fira Code", "Consolas", "SFMono-Regular", monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-x: auto;
+    user-select: text;
+}
+
+
+/*
+=================================================
+Gallery Modal
+=================================================
+*/
+.jupo-gallery-modal {
+    width: 80vw;
+    height: 90vh;
+    
+    background-color: rgb(from var(--dialog-bg) r g b / 0.85);
+}
+
+.jupo-gallery-modal-content {
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.jupo-gallery-modal-container {
+    display: flex;
+    flex-direction: row;
+    gap: 32;
+    overflow: hidden;
+}
+
+/* --- メディア --- */
+.jupo-gallery-modal-media-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    flex: 1;
+}
+
+.jupo-gallery-modal-media {
+    max-height: 80vh;
+    max-width: 100%;
+    object-fit: contain;
+    border-radius: 12px;
+    background: rgba(11, 15, 24, 0.6);
+}
+
+/* --- 情報コンテナ --- */
+.jupo-gallery-modal-info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+    overflow-y: auto;
+    flex: 1;
+    user-select: text;
+}
+
+.jupo-gallery-modal-info-item {
+    display: flex;
+    flex-direction: row;
+    padding: 12px 16px;
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    gap: 16px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.jupo-gallery-modal-info-label {
+    color: var(--text-secondary);
+    font-weight: 600;
+    width: 120px;
+    flex-shrink: 0;
+    word-break: break-all;
+}
+
+.jupo-gallery-modal-info-value {
+    color: var(--text-primary);
+    white-space: pre-wrap;
+    word-break: break-all;
+    flex: 1;
+    min-width: 0;
+}
+
+
+

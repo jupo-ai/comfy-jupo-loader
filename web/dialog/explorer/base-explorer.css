@@ -1,0 +1,473 @@
+/*
+=================================================
+Base Explorer
+=================================================
+*/
+/* --- ウィンドウレイアウト --- */
+.jupo-explorer-dialog {
+    --explorer-tree-width: clamp(220px, 25%, 320px);
+
+    width: 80vw;
+    height: 90vh;
+}
+
+.jupo-explorer-dialog-content {
+    padding: 0 20px 20px 20px;
+
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/*
+-------------------------------------------------
+ヘッダー
+-------------------------------------------------
+*/
+
+.jupo-explorer-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.jupo-explorer-header-title {
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0.04rem;
+}
+
+/* --- 検索窓 --- */
+.jupo-explorer-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.jupo-explorer-search > input {
+    width: 260px;
+    box-sizing: border-box;
+    padding: 6px 12px;
+    
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 2px;
+    outline: none;
+    
+    color: var(--text-primary);
+    font-size: 12px;
+    transition: all 0.1s;
+    letter-spacing: 0.02rem;
+}
+
+.jupo-explorer-search > input:focus {
+    background-color: var(--input-bg-focus);
+    border-color: var(--input-border-focus);
+}
+
+/* --- クリアボタン --- */
+.jupo-explorer-search > button {
+    min-width: 70px;
+    padding: 6px 12px;
+
+    background-color: transparent;
+    border: 1px solid var(--dialog-border);
+    border-radius: 2px;
+    color: var(--text-primary);
+
+    font-size: 12px;
+}
+
+.jupo-explorer-search > button:hover {
+    background-color: var(--dialog-hover);
+}
+
+.jupo-explorer-search > button:active {
+    transform: translateY(1px);
+}
+
+
+
+/*
+-------------------------------------------------
+メインエリア
+-------------------------------------------------
+*/
+.jupo-explorer-main-area {
+    flex: 1;
+
+    display: flex;
+    gap: 10px;
+    min-height: 0;
+}
+
+
+/*
+-------------------------------------------------
+ディレクトリツリー
+-------------------------------------------------
+*/
+.jupo-explorer-tree {
+    width: var(--explorer-tree-width);
+    font-size: 14px;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 8px;
+
+    border-radius: 8px;
+    background-color: var(--dialog-bg-secondary);
+}
+
+.jupo-explorer-tree ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.jupo-explorer-tree-summary {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 8px;
+    list-style: none;
+    width: 100%;
+    min-height: 28px;
+    box-sizing: border-box;
+    user-select: none;
+    border: 1px solid transparent;
+}
+
+.jupo-explorer-tree-summary > span::before {
+    content: "";
+    display: inline-block;
+    width: 20px;
+    margin-right: 4px;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.jupo-explorer-tree-summary.has-sub > span::before {
+    content: "▶";
+}
+
+.jupo-explorer-tree-summary:hover {
+    background-color: var(--list-hover);
+    border-color: var(--dialog-border);
+    color: var(--text-primary);
+}
+
+.jupo-explorer-tree-details[open] > .jupo-explorer-tree-summary > span::before {
+    transform: rotate(90deg);
+}
+
+.jupo-explorer-tree-summary.active-dir {
+    background-color: var(--list-active);
+    color: var(--text-primary);
+    font-weight: bold;
+    border-color: var(--list-active);
+}
+
+.jupo-explorer-subtree {
+    margin-left: 24px;
+}
+
+.jupo-explorer-tree-details {
+    padding: 0;
+    margin: 2px 0;
+}
+
+
+/*
+-------------------------------------------------
+エクスプローラビュー
+-------------------------------------------------
+*/
+.jupo-explorer-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/*
+-------------------------------------------------
+ディレクトリビュー
+-------------------------------------------------
+*/
+.jupo-explorer-dirs {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+}
+
+/* --- ラベル --- */
+.jupo-explorer-dirs-label {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.03em;
+}
+
+.jupo-explorer-dirs-label::after {
+    content: "";
+    flex: 1;
+    border-top: 2px dashed var(--dialog-border);
+    margin-left: 8px;
+}
+
+/* --- ディレクトリアイテムコンテナ --- */
+.jupo-explorer-dirs-items {
+    margin-left: 8px;
+    padding-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* --- ディレクトリアイテム --- */
+.jupo-explorer-dirs-item {
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    width: fit-content;
+}
+
+.jupo-explorer-dirs-item:hover {
+    background-color: var(--list-hover);
+    color: var(--text-primary);
+    transform: translateX(2px);
+}
+
+.jupo-explorer-dirs-item:active {
+    transform: translateX(0);
+}
+
+
+/*
+-------------------------------------------------
+ファイルビュー
+-------------------------------------------------
+*/
+.jupo-explorer-files {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+}
+
+/* --- ラベル --- */
+.jupo-explorer-files-label {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.03em;
+}
+
+.jupo-explorer-files-label::after {
+    content: "";
+    flex: 1;
+    border-top: 2px dashed var(--dialog-border);
+    margin-left: 8px;
+}
+
+/* --- ファイルアイテムコンテナ --- */
+.jupo-explorer-files-items {
+    padding-left: 16px;
+    padding-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+/* --- ファイルアイテム --- */
+.jupo-explorer-files-item {
+    position: relative;
+    background-color: rgb(11 15 24 / 0.6);
+    border: 1px solid var(--dialog-border);
+    border-radius: 10px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s, background-color 0.2s;
+    flex-shrink: 0;
+}
+
+.jupo-explorer-files-item:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-hover);
+    background-color: rgb(24 28 50 / 0.75);
+}
+
+/* --- ファイルアイテム (新規作成) --- */
+.jupo-explorer-files-item.new-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(12 14 26 / 0.35);
+    border: 1px dashed var(--dialog-border);
+}
+
+.jupo-explorer-files-item.new-item:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-hover);
+}
+
+.jupo-explorer-files-item.new-item > i {
+    font-size: 48px;
+    color: var(--text-secondary);
+    transition: color 0.2s;
+}
+
+.jupo-explorer-files-item.new-item:hover > i {
+    color: var(--text-primary);
+}
+
+/* --- ファイルアイテム オーバーレイ --- */
+.jupo-explorer-files-item-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.6) 50% , transparent 100%);
+    font-size: 13px;
+    padding: 20% 8px 8px 8px;
+    text-align: center;
+    word-break: break-all;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.jupo-explorer-files-item-overlay > p {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.02em;
+}
+
+/* --- ファイルアイテム アクションボタン --- */
+.jupo-explorer-files-item-actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    justify-content: flex-end;
+    padding: 6px;
+    width: 100%;
+    z-index: 10;
+}
+
+.jupo-explorer-files-item-action {
+    background: rgb(0 0 0 / 0.75);
+    border-radius: 8px;
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    border: 1px solid var(--dialog-border);
+    cursor: pointer;
+    opacity: 0;
+    color: var(--text-primary);
+}
+
+.jupo-explorer-files-item:hover .jupo-explorer-files-item-action {
+    opacity: 1;
+}
+
+.jupo-explorer-files-item-action:hover {
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+}
+
+/* --- ファイルアイテム メディア --- */
+.jupo-explorer-files-item-media {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.2s;
+}
+
+.jupo-explorer-files-item:hover .jupo-explorer-files-item-media {
+    transform: scale(1.1);
+}
+
+.jupo-explorer-files-item-media.empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+
+/* --- 検索結果 --- */
+.jupo-explorer-search-results-container {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+}
+
+/* 検索結果数 */
+.jupo-explorer-search-results-counter {
+    display: flex;
+    align-items: center;
+    color: var(--text-secondary);
+    letter-spacing: 0.03em;
+
+    font-size: 12px;
+    justify-content: flex-end;
+}
+
+/* 結果グループコンテナ */
+.jupo-explorer-search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* 結果ディレクトリ名 */
+.jupo-explorer-search-result-dir-header {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.03em;
+}
+
+.jupo-explorer-search-result-dir-header::after {
+    content: "";
+    flex: 1;
+    border-top: 2px dashed var(--dialog-border);
+    margin-left: 8px;
+}
+
+/* 結果アイテムコンテナ */
+.jupo-explorer-search-result-items {
+    padding-left: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+

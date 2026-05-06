@@ -1,0 +1,210 @@
+/*
+=================================================
+LBW Dialog
+=================================================
+*/
+/* --- ウィンドウレイアウト --- */
+.jupo-lbw-dialog {
+    width: 70vw;
+    height: 90vh;
+}
+
+.jupo-lbw-content {
+    margin-top: calc(-1 * var(--toolbar-height));
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* --- ヘッダー --- */
+.jupo-lbw-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px 12px;
+
+    border-bottom: 1px solid var(--dialog-border);
+    background-image: linear-gradient(to right, var(--dialog-bg-secondary), transparent);
+}
+
+.jupo-lbw-header > span {
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.04rem;
+    word-break: break-all;
+}
+
+
+/* --- ボディ --- */
+.jupo-lbw-body {
+    padding: 24px;
+
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 25%;
+    grid-template-rows: max-content max-content minmax(0, 1fr);
+    grid-template-areas: 
+        "block-area modeltype-area"
+        "block-area bimo-area"
+        "block-area schedule-area";
+    column-gap: 24px;
+    row-gap: 12px;
+    min-height: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.jupo-lbw-body--schedule-disabled {
+    grid-template-rows: max-content max-content minmax(0, 1fr);
+    grid-template-areas: 
+        "block-area modeltype-area"
+        "block-area bimo-area"
+        "block-area .";
+}
+
+.jupo-lbw-block-area {
+    grid-area: block-area;
+    min-height: 0;
+    overflow-y: auto;
+}
+.jupo-lbw-modeltype-area {
+    grid-area: modeltype-area;
+}
+.jupo-lbw-bimo-area {
+    grid-area: bimo-area;
+}
+.jupo-lbw-schedule-area {
+    grid-area: schedule-area;
+}
+
+
+/* --- 各セクションのヘッダー --- */
+.jupo-lbw-section-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--accent-color);
+    font-size: 13px;
+}
+
+.jupo-lbw-section-header > span {
+    color: var(--text-secondary);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+
+/*
+-------------------------------------------------
+Block Section
+-------------------------------------------------
+*/
+.jupo-block-section {
+    display: grid;
+    grid-template-areas: 
+        "upper upper"
+        "left right"
+        "bottom bottom";
+    padding: 16px;
+    gap: 16px;
+}
+
+.jupo-block-section-slider {
+    width: 300px;
+}
+
+.jupo-block-section-sliders {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.jupo-block-section-sliders.--upper {
+    grid-area: upper;
+}
+.jupo-block-section-sliders.--left {
+    grid-area: left;
+}
+.jupo-block-section-sliders.--right {
+    grid-area: right;
+}
+
+.jupo-block-section--unet .jupo-block-section-sliders.--right {
+    flex-direction: column-reverse;
+}
+.jupo-block-section-sliders.--bottom {
+    grid-area: bottom;
+}
+
+
+/*
+-------------------------------------------------
+ModelType Section
+-------------------------------------------------
+*/
+.jupo-modeltype-section {
+    display: block;
+}
+
+
+/*
+-------------------------------------------------
+BIMO Section
+-------------------------------------------------
+*/
+.jupo-bimo-section-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.jupo-bimo-section-input {
+    flex: 1;
+    box-sizing: border-box;
+    padding: 10px 12px;
+
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    outline: none;
+
+    color: var(--text-primary);
+    font-size: 14px;
+    letter-spacing: 0.02rem;
+}
+
+.jupo-bimo-section-input:focus {
+    background-color: var(--input-bg-focus);
+    border-color: var(--input-border-focus);
+}
+
+.jupo-bimo-section-button {
+    padding: 6px 12px;
+    background-color: var(--accent-color);
+    color: var(--text-primary);
+
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.jupo-bimo-section-button:hover {
+    background-color: var(--accent-hover);
+}
+.jupo-bimo-section-button:active {
+    transform: translateY(1px);
+}
+

@@ -1,0 +1,38 @@
+/*
+=================================================
+Base Explorer Config
+=================================================
+*/
+/* --- オーバーレイ --- */
+.jupo-explorer-config-overlay {
+    background-color: transparent;
+    display: block;
+    backdrop-filter: none;
+}
+
+/* --- ダイアログ本体 --- */
+.jupo-explorer-config {
+    position: fixed;
+    min-width: 400px;
+}
+
+/* --- コンテンツ領域のレイアウト --- */
+.jupo-explorer-config-content {
+    padding: 0 20px 20px 20px;
+}
+
+/* --- アイテムコンテナ --- */
+.jupo-explorer-config-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 14px;
+}
+
+/* --- アイテム --- */
+.jupo-explorer-config-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
