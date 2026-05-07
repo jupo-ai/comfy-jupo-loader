@@ -2,7 +2,7 @@ import { app } from "../../../../scripts/app.js";
 import { mkName } from "../../utils.js";
 import { StringPrimitiveField } from "../../dom/primitive-field.js";
 
-const PACKAGE_NAME = "Primitive";
+const PACKAGE_NAME = "Loader";
 const CLASS_NAMES = [
     mkName(PACKAGE_NAME, "StringSelector"),
 ];

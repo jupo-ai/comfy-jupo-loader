@@ -2,7 +2,7 @@ import { app } from "../../../../scripts/app.js";
 import { mkName, Path } from "../../utils.js";
 import { ImageExplorer } from "../../dialog/explorer/image-explorer.js";
 
-const PACKAGE_NAME = "Image";
+const PACKAGE_NAME = "Loader";
 const CLASS_NAMES = [
     mkName(PACKAGE_NAME, "ImageLoader"), 
 ];

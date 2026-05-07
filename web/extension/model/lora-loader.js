@@ -2,7 +2,7 @@ import { app } from "../../../../scripts/app.js";
 import { mkName } from "../../utils.js";
 import { LoraField } from "../../dom/lora-field.js";
 
-const PACKAGE_NAME = "Model";
+const PACKAGE_NAME = "Loader";
 const CLASS_NAMES = [
     mkName(PACKAGE_NAME, "LoraStack"), 
     mkName(PACKAGE_NAME, "LoraLoader")

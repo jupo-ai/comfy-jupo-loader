@@ -3,7 +3,7 @@ import { mkName, applyContextMenuPatch, Path } from "../../utils.js";
 import { ResourceInfo } from "../../dialog/model-info/resource-info.js";
 import { ResourceExplorer } from "../../dialog/explorer/resource-explorer.js";
 
-const PACKAGE_NAME = "Model";
+const PACKAGE_NAME = "Loader";
 const LOADER_CONFIGS = {
     [mkName(PACKAGE_NAME, "CheckpointLoader")]: {
         widgets: [

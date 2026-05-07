@@ -1,6 +1,6 @@
 from comfy_api.latest import io
 from ...utils import mk_name
-from .common import PACKAGE_NAME, CATEGORY
+from ..common import PACKAGE_NAME, CATEGORY
 from .utils import get_available_stack
 
 import comfy.sd

@@ -2,7 +2,7 @@ import { app } from "../../../../scripts/app.js";
 import { mkName } from "../../utils.js";
 import { ResourceField } from "../../dom/resource-field.js";
 
-const PACKAGE_NAME = "Model";
+const PACKAGE_NAME = "Loader";
 const SELECTOR_CONFIGS = {
     [mkName(PACKAGE_NAME, "CheckpointSelector")]: {
         apiDir: "checkpoints",

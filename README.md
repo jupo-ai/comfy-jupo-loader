@@ -35,8 +35,6 @@ ComfyUI 標準の `requirements.txt` はインストール済みである前提�
 
 ### Model
 
-モデル系ノードは `jupo/Model` にあります。
-
 ![Checkpoint Nodes](assets/nodes_checkpoint.png)
 
 #### Checkpoint
@@ -89,8 +87,6 @@ Schedule 機能には重大な不具合があるため、現在 Schedule UI は�
 
 ### Image
 
-画像系ノードは `jupo/Image` にあります。
-
 ![Image Loader](assets/nodes_image.png)
 
 #### Image Loader
@@ -98,8 +94,6 @@ Schedule 機能には重大な不具合があるため、現在 Schedule UI は�
 `Image Loader` は ComfyUI の input フォルダとそのサブフォルダ内の画像を読み込みます。旧 UI と Nodes 2.0 のどちらでも独自エクスプローラを開きます。サブフォルダ内画像でも MaskEditor が扱えるように、画像パスの正規化も行います。
 
 ### Primitive
-
-プリミティブ系ノードは `jupo/Primitive` にあります。
 
 ![Primitive Nodes](assets/nodes_primitive.png)
 
