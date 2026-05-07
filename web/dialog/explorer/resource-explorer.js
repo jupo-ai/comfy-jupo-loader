@@ -42,7 +42,7 @@ export class ResourceExplorer extends BaseExplorer {
                 const dialog = new ResourceInfo({
                     apiDir: this.apiDir,
                     modelPath: node.path,
-                    onClosed: () => this.refresh()
+                    onClosed: (infoData) => this.updateFileInfo(node.path, infoData)
                 });
                 dialog.show();
             }

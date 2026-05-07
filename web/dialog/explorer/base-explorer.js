@@ -166,6 +166,24 @@ export class BaseExplorer extends BaseModal {
         }
     }
 
+    async updateFileInfo(filePath, infoData) {
+        const updated = this.dataManager.updateFileInfo(filePath, infoData);
+        if (!updated) {
+            await this.refresh(this.currentDir);
+            return;
+        }
+
+        if (this.searchManager.isSearching) {
+            await this.searchManager.refresh();
+            return;
+        }
+
+        const currentNode = this.dataManager.findDir(this.currentDir);
+        if (currentNode) {
+            await this.filesManager.display(currentNode);
+        }
+    }
+
 
     // ------------------------------------------
     // ユーティリティ

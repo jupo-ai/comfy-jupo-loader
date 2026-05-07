@@ -70,4 +70,42 @@ export class DataManager {
         
         this.data = root;
     }
+
+    findDir(path) {
+        if (!this.data) return null;
+        if (!path || path === ".") return this.data;
+
+        const parts = path.split("/").filter(Boolean);
+        let currentNode = this.data;
+        for (const part of parts) {
+            currentNode = currentNode.children.find(
+                child => child.type === "dir" && child.name === part
+            );
+            if (!currentNode) return null;
+        }
+        return currentNode;
+    }
+
+    findFile(path) {
+        if (!this.data || !path) return null;
+
+        const normalizedPath = path.replace(/\\/g, "/");
+        const parts = normalizedPath.split("/");
+        const filename = parts.pop();
+        const dirPath = parts.join("/");
+        const dirNode = this.findDir(dirPath);
+        if (!dirNode) return null;
+
+        return dirNode.children.find(
+            child => child.type === "file" && child.name === filename
+        ) ?? null;
+    }
+
+    updateFileInfo(path, info) {
+        const fileNode = this.findFile(path);
+        if (!fileNode) return false;
+
+        fileNode.info = info ?? {};
+        return true;
+    }
 }

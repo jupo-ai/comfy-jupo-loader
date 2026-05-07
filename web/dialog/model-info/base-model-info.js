@@ -19,6 +19,7 @@ export class BaseModelInfo extends BaseModal {
         this.onClosed = onClosed;
         
         this.isLoading = false;
+        this.isClosing = false;
         this.infoData = {};
         this.apiDir = null;
 
@@ -177,10 +178,16 @@ export class BaseModelInfo extends BaseModal {
     }
 
     async close() {
-        if (!this.isLoading) {
+        if (this.isLoading || this.isClosing) return;
+
+        this.isClosing = true;
+        await super.close();
+
+        try {
             await this.saveInfoData();
             await this.onClosed?.(this.infoData);
-            await super.close();
+        } catch (error) {
+            console.error("モデル情報の保存に失敗しました:", error);
         }
     }
 }

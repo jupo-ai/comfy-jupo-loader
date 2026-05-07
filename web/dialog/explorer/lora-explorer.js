@@ -41,7 +41,7 @@ export class LoraExplorer extends BaseExplorer {
             onClick: () => {
                 const dialog = new LoraInfo({
                     modelPath: node.path, 
-                    onClosed: () => this.refresh()
+                    onClosed: (infoData) => this.updateFileInfo(node.path, infoData)
                 });
                 dialog.show();
             }

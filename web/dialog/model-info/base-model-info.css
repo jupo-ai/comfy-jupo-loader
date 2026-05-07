@@ -16,7 +16,7 @@ Base Model Info
 .jupo-model-info {
     width: 60vw;
     height: 90vh;
-    overflow-y: auto;
+    overflow: hidden;
 }
 
 .jupo-model-info-content {
@@ -25,6 +25,7 @@ Base Model Info
     display: flex;
     flex-direction: column;
     min-height: 0;
+    overflow-y: auto;
 }
 
 /* --- ヘッダー --- */
