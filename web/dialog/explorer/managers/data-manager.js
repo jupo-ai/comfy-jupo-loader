@@ -70,4 +70,19 @@ export class DataManager {
         
         this.data = root;
     }
+
+    findDir(path) {
+        if (!this.data) return null;
+        if (!path || path === ".") return this.data;
+
+        const parts = path.split("/").filter(Boolean);
+        let currentNode = this.data;
+        for (const part of parts) {
+            currentNode = currentNode.children.find(
+                child => child.type === "dir" && child.name === part
+            );
+            if (!currentNode) return null;
+        }
+        return currentNode;
+    }
 }
