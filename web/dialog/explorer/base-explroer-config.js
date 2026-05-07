@@ -79,7 +79,7 @@ export class BaseExplorerConfig extends BaseModal {
             height: 24,
             onChange: (newValue) => this._handleChangeUseVirtualScroll(newValue),
         });
-        this.addItem("仮想スクロールを使用する (開発中)", this.toggleVirtualScroll.element);
+        this.addItem("仮想スクロールを使用する", this.toggleVirtualScroll.element);
 
         // プレビュー保存時のサムネイル化
         this.toggleSavePreviewAsThumbnail = new ToggleSwitch({
@@ -87,7 +87,7 @@ export class BaseExplorerConfig extends BaseModal {
             height: 24,
             onChange: (newValue) => this._handleChangeSavePreviewAsThumbnail(newValue),
         });
-        this.addItem("縮小プレビュー保存 (開発中)", this.toggleSavePreviewAsThumbnail.element);
+        this.addItem("縮小プレビュー保存", this.toggleSavePreviewAsThumbnail.element);
     }
 
     // ------------------------------------------
