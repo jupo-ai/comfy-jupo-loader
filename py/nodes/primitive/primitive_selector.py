@@ -1,6 +1,6 @@
 from comfy_api.latest import io
 from ...utils import mk_name
-from ..common import PACKAGE_NAME, CATEGORY
+from .._common import PACKAGE_NAME, CATEGORY
 
 import json
 
