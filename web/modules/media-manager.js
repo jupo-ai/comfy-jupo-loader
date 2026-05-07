@@ -95,13 +95,48 @@ export class MediaManager {
     // メディアファイルをダウンロード
     //  mediaType: image / video / audio
     // ------------------------------------------
-    async downloadMediaFile({ dirName, filePath, url, mediaType, thumbnail = false }) {
-        await apiPost(this.packageName, "download_media", {
-            dir: dirName, 
-            file: filePath, 
-            url: url, 
-            type: mediaType,
-            thumbnail: thumbnail,
-        });
+    async downloadMediaFile({ dirName, filePath, url, mediaType, thumbnail = false, onProgress = null }) {
+        const taskId = this.createTaskId();
+        const progressPromise = this.watchDownloadProgress(taskId, onProgress);
+
+        try {
+            await apiPost(this.packageName, "download_media", {
+                dir: dirName,
+                file: filePath,
+                url: url,
+                type: mediaType,
+                thumbnail: thumbnail,
+                taskId: taskId,
+            });
+        } finally {
+            await progressPromise;
+        }
+    }
+
+    async watchDownloadProgress(taskId, onProgress) {
+        if (!onProgress) return;
+
+        let unknownCount = 0;
+        while (true) {
+            await new Promise(resolve => setTimeout(resolve, 150));
+
+            const progress = await apiGet(this.packageName, `download_progress?id=${encodeURIComponent(taskId)}`);
+            onProgress(progress);
+
+            if (["done", "error"].includes(progress.status)) {
+                return;
+            }
+            if (progress.status === "unknown") {
+                unknownCount++;
+                if (unknownCount > 40) return;
+            } else {
+                unknownCount = 0;
+            }
+        }
+    }
+
+    createTaskId() {
+        return globalThis.crypto?.randomUUID?.()
+            ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
     }
 }

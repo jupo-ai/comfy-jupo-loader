@@ -25,7 +25,9 @@ PACKAGE_NAME = "MediaManager"
 MEDIA_CACHE = {}
 MEDIA_PATH_CACHE = {}
 MEDIA_TOKEN_CACHE = {}
+DOWNLOAD_PROGRESS = {}
 TOKEN_EXPIRE_TIME = 3600
+DOWNLOAD_PROGRESS_EXPIRE_TIME = 600
 SUPPORTED_EXTENSIONS = {
     "image": ["jpg", "jpeg", "bmp", "png", "webp", "gif"], 
     "video": ["mp4", "webm", "avi"], 
@@ -62,6 +64,31 @@ def cleanup_media_cache():
 
     for media_path in remove_paths:
         del MEDIA_TOKEN_CACHE[media_path]
+
+
+def cleanup_download_progress():
+    remove_ids = set()
+    current_time = time.time()
+
+    for task_id, data in DOWNLOAD_PROGRESS.items():
+        if current_time - data.get("updated_at", 0) > DOWNLOAD_PROGRESS_EXPIRE_TIME:
+            remove_ids.add(task_id)
+
+    for task_id in remove_ids:
+        del DOWNLOAD_PROGRESS[task_id]
+
+
+def update_download_progress(task_id, *, loaded=0, total=0, status="downloading", error=None):
+    if not task_id:
+        return
+
+    DOWNLOAD_PROGRESS[task_id] = {
+        "loaded": loaded,
+        "total": total,
+        "status": status,
+        "error": error,
+        "updated_at": time.time(),
+    }
 
 
 def clear_path_cache(dirname, model_file):
@@ -374,6 +401,28 @@ async def serve_media(req: web.Request):
     return web.FileResponse(media_path, headers=headers)
 
 
+@Endpoint.get(PACKAGE_NAME, "download_progress")
+async def download_progress(req: web.Request):
+    cleanup_download_progress()
+
+    task_id = req.query.get("id")
+    data = DOWNLOAD_PROGRESS.get(task_id)
+    if not data:
+        return web.json_response({
+            "loaded": 0,
+            "total": 0,
+            "status": "unknown",
+            "error": None,
+        })
+
+    return web.json_response({
+        "loaded": data.get("loaded", 0),
+        "total": data.get("total", 0),
+        "status": data.get("status", "unknown"),
+        "error": data.get("error"),
+    })
+
+
 @Endpoint.post(PACKAGE_NAME, "remove_media")
 async def remove_media(req: web.Request):
     """
@@ -435,8 +484,10 @@ async def download_media(req: web.Request):
     url = data.get("url")
     media_type = data.get("type", "").lower()
     use_thumbnail = data.get("thumbnail", False)
+    task_id = data.get("taskId")
 
     clear_path_cache(dirname, filename)
+    update_download_progress(task_id, status="starting")
 
     full_path = folder_paths.get_full_path(dirname, filename)
     file_no_ext = os.path.splitext(full_path)[0]
@@ -454,28 +505,66 @@ async def download_media(req: web.Request):
 
     print(f"ダウンロード: {url}")
     CHUNK_SIZE = 8192
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            response.raise_for_status()
-            if use_thumbnail and media_type == "image":
-                image_bytes = await response.read()
-                try:
-                    saved_thumbnail = save_thumbnail_image(image_bytes, save_path)
-                except Exception as e:
-                    print(f"サムネイル保存失敗。元画像を保存します: {e}")
-                    saved_thumbnail = False
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                response.raise_for_status()
+                total_size = int(response.headers.get("content-length") or 0)
+                loaded_size = 0
 
-                if not saved_thumbnail:
-                    async with aiofiles.open(save_path, "wb") as f:
-                        await f.write(image_bytes)
-            else:
-                total_size= int(response.headers.get("content-length") or 0)
-                pbar = tqdm(total=total_size, unit="B", unit_scale=True)
-                async with aiofiles.open(save_path, "wb") as f:
+                async def read_chunks():
+                    nonlocal loaded_size
+                    chunks = []
+                    pbar = tqdm(total=total_size, unit="B", unit_scale=True)
                     with pbar:
                         async for chunk in response.content.iter_chunked(CHUNK_SIZE):
-                            await f.write(chunk)
+                            chunks.append(chunk)
+                            loaded_size += len(chunk)
                             pbar.update(len(chunk))
+                            update_download_progress(
+                                task_id,
+                                loaded=loaded_size,
+                                total=total_size,
+                                status="downloading"
+                            )
+                    return b"".join(chunks)
+
+                if use_thumbnail and media_type == "image":
+                    image_bytes = await read_chunks()
+                    update_download_progress(
+                        task_id,
+                        loaded=loaded_size,
+                        total=total_size,
+                        status="processing"
+                    )
+                    try:
+                        saved_thumbnail = save_thumbnail_image(image_bytes, save_path)
+                    except Exception as e:
+                        print(f"サムネイル保存失敗。元画像を保存します: {e}")
+                        saved_thumbnail = False
+
+                    if not saved_thumbnail:
+                        async with aiofiles.open(save_path, "wb") as f:
+                            await f.write(image_bytes)
+                else:
+                    pbar = tqdm(total=total_size, unit="B", unit_scale=True)
+                    async with aiofiles.open(save_path, "wb") as f:
+                        with pbar:
+                            async for chunk in response.content.iter_chunked(CHUNK_SIZE):
+                                await f.write(chunk)
+                                loaded_size += len(chunk)
+                                pbar.update(len(chunk))
+                                update_download_progress(
+                                    task_id,
+                                    loaded=loaded_size,
+                                    total=total_size,
+                                    status="downloading"
+                                )
+
+        update_download_progress(task_id, loaded=loaded_size, total=total_size, status="done")
+    except Exception as e:
+        update_download_progress(task_id, status="error", error=str(e))
+        raise
     
     return web.json_response("ok")
 

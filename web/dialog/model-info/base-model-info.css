@@ -383,6 +383,54 @@ Gallery Section
     border-color: var(--accent-hover);
 }
 
+.jupo-gallery-section-item-action:disabled {
+    cursor: wait;
+    opacity: 0.8;
+}
+
+.jupo-gallery-section-download-progress {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    height: 20px;
+    border-radius: 999px;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.72);
+    border: 1px solid var(--dialog-border);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 12;
+    transition: opacity 0.15s;
+}
+
+.jupo-gallery-section-download-progress--visible {
+    opacity: 1;
+}
+
+.jupo-gallery-section-download-progress-bar {
+    height: 100%;
+    width: 0%;
+    background-color: var(--accent-color);
+    transition: width 0.15s;
+}
+
+.jupo-gallery-section-download-progress--error .jupo-gallery-section-download-progress-bar {
+    background-color: var(--accent-error);
+}
+
+.jupo-gallery-section-download-progress-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
 .jupo-gallery-section-item--empty {
     grid-column: 1 / -1;
     display: flex;

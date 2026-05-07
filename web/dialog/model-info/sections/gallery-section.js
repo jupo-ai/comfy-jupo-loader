@@ -43,6 +43,7 @@ export class GallerySection {
 
         const isVideo = image.type === "video" || this.isVideo(image.url);
         const item = $el("div.jupo-gallery-section-item");
+        const progress = this.createDownloadProgress();
 
         item.addEventListener('click', (e) => {
             if (!e.target.closest(".jupo-gallery-section-item-action")) {
@@ -55,20 +56,32 @@ export class GallerySection {
             title: "プレビューとして保存", 
             onclick: async (e) => {
                 if (confirm("プレビューとして保存しますか？")) {
-                    await this.mediaManager.downloadMediaFile({
-                        dirName: this.parent.apiDir, 
-                        filePath: this.parent.modelPath, 
-                        url: image.url, 
-                        mediaType: isVideo ? "video" : "image",
-                        thumbnail: !isVideo && this.getSavePreviewAsThumbnailConfig(),
-                    });
-                    await this.parent.previewSection?.refresh();
+                    saveButton.disabled = true;
+                    this.setDownloadProgress(progress, { status: "starting" });
+
+                    try {
+                        await this.mediaManager.downloadMediaFile({
+                            dirName: this.parent.apiDir,
+                            filePath: this.parent.modelPath,
+                            url: image.url,
+                            mediaType: isVideo ? "video" : "image",
+                            thumbnail: !isVideo && this.getSavePreviewAsThumbnailConfig(),
+                            onProgress: (data) => this.setDownloadProgress(progress, data),
+                        });
+                        await this.parent.previewSection?.refresh();
+                    } catch (error) {
+                        this.setDownloadProgress(progress, { status: "error" });
+                        console.error("プレビュー保存に失敗しました:", error);
+                    } finally {
+                        saveButton.disabled = false;
+                        setTimeout(() => this.hideDownloadProgress(progress), 800);
+                    }
                 }
             }
         });
 
         const actions = $el("div.jupo-gallery-section-item-actions", [ saveButton ]);
-        item.append(actions);
+        item.append(actions, progress.element);
 
         if (isVideo) {
             let url = image.url;
@@ -108,6 +121,51 @@ export class GallerySection {
 
     updateCount(count) {
         this.counter.textContent = count.toString();
+    }
+
+    createDownloadProgress() {
+        const bar = $el("div.jupo-gallery-section-download-progress-bar");
+        const label = $el("span.jupo-gallery-section-download-progress-label", {
+            textContent: "0%"
+        });
+        const element = $el("div.jupo-gallery-section-download-progress", [
+            bar,
+            label,
+        ]);
+        return { element, bar, label };
+    }
+
+    setDownloadProgress(progress, data) {
+        const status = data?.status ?? "downloading";
+        const total = data?.total ?? 0;
+        const loaded = data?.loaded ?? 0;
+        const percent = total > 0
+            ? Math.min(100, Math.round((loaded / total) * 100))
+            : null;
+
+        progress.element.classList.add("jupo-gallery-section-download-progress--visible");
+        progress.element.classList.toggle("jupo-gallery-section-download-progress--error", status === "error");
+        progress.bar.style.width = `${percent ?? 100}%`;
+
+        if (status === "processing") {
+            progress.label.textContent = "処理中";
+        } else if (status === "done") {
+            progress.label.textContent = "完了";
+            progress.bar.style.width = "100%";
+        } else if (status === "error") {
+            progress.label.textContent = "失敗";
+        } else {
+            progress.label.textContent = percent === null ? "保存中" : `${percent}%`;
+        }
+    }
+
+    hideDownloadProgress(progress) {
+        progress.element.classList.remove(
+            "jupo-gallery-section-download-progress--visible",
+            "jupo-gallery-section-download-progress--error"
+        );
+        progress.bar.style.width = "0%";
+        progress.label.textContent = "0%";
     }
 
     getSavePreviewAsThumbnailConfig() {
