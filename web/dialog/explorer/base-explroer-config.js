@@ -72,6 +72,22 @@ export class BaseExplorerConfig extends BaseModal {
             onChange: (newValue) => this._handleChangeVisibleDirs(newValue), 
         });
         this.addItem("ディレクトリを表示", this.toggleDirs.element);
+
+        // 仮想スクロール
+        this.toggleVirtualScroll = new ToggleSwitch({
+            defaultValue: this.explorer.getConfig("useVirtualScroll"),
+            height: 24,
+            onChange: (newValue) => this._handleChangeUseVirtualScroll(newValue),
+        });
+        this.addItem("仮想スクロールを使用する (開発中)", this.toggleVirtualScroll.element);
+
+        // プレビュー保存時のサムネイル化
+        this.toggleSavePreviewAsThumbnail = new ToggleSwitch({
+            defaultValue: this.explorer.getConfig("savePreviewAsThumbnail"),
+            height: 24,
+            onChange: (newValue) => this._handleChangeSavePreviewAsThumbnail(newValue),
+        });
+        this.addItem("縮小プレビュー保存 (開発中)", this.toggleSavePreviewAsThumbnail.element);
     }
 
     // ------------------------------------------
@@ -95,6 +111,15 @@ export class BaseExplorerConfig extends BaseModal {
     async _handleChangeVisibleDirs(newValue) {
         await this.explorer.setConfig("visibleDirs", newValue);
         this.explorer.dirsManager.applyVisible();
+    }
+
+    async _handleChangeUseVirtualScroll(newValue) {
+        await this.explorer.setConfig("useVirtualScroll", newValue);
+        await this.explorer.recreateFilesManager();
+    }
+
+    async _handleChangeSavePreviewAsThumbnail(newValue) {
+        await this.explorer.setConfig("savePreviewAsThumbnail", newValue);
     }
 
 

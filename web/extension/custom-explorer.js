@@ -64,6 +64,20 @@ const SETTINGS = {
         type: "hidden", 
         defaultValue: false, 
     }, 
+
+    useVirtualScroll: {
+        id: null,
+        name: "仮想スクロールを使用する (開発中)",
+        type: "hidden",
+        defaultValue: false,
+    },
+
+    savePreviewAsThumbnail: {
+        id: null,
+        name: "縮小プレビュー保存 (開発中)",
+        type: "hidden",
+        defaultValue: false,
+    },
 };
 
 

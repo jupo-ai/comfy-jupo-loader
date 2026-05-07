@@ -13,6 +13,9 @@ import aiofiles
 import base64
 from tqdm import tqdm
 import glob
+from io import BytesIO
+
+from PIL import Image, PngImagePlugin
 
 from ..utils import Endpoint
 import folder_paths
@@ -21,12 +24,15 @@ PACKAGE_NAME = "MediaManager"
 
 MEDIA_CACHE = {}
 MEDIA_PATH_CACHE = {}
+MEDIA_TOKEN_CACHE = {}
 TOKEN_EXPIRE_TIME = 3600
 SUPPORTED_EXTENSIONS = {
     "image": ["jpg", "jpeg", "bmp", "png", "webp", "gif"], 
     "video": ["mp4", "webm", "avi"], 
     "audio": ["mp3", "ogg", "wav"]
 }
+THUMBNAIL_MAX_SIZE = 512
+RESAMPLE_LANCZOS = getattr(getattr(Image, "Resampling", Image), "LANCZOS")
 
 # ===============================================
 # ユーティリティ
@@ -48,6 +54,15 @@ def cleanup_media_cache():
     for token in remove_tokens:
         del MEDIA_CACHE[token]
 
+    remove_paths = set()
+    for media_path, data in MEDIA_TOKEN_CACHE.items():
+        token = data.get("token")
+        if token in remove_tokens or token not in MEDIA_CACHE:
+            remove_paths.add(media_path)
+
+    for media_path in remove_paths:
+        del MEDIA_TOKEN_CACHE[media_path]
+
 
 def clear_path_cache(dirname, model_file):
     """
@@ -56,6 +71,57 @@ def clear_path_cache(dirname, model_file):
     cache_key = (dirname, model_file)
     if cache_key in MEDIA_PATH_CACHE:
         del MEDIA_PATH_CACHE[cache_key]
+
+    media_path = get_media_path(model_file, dirname)
+    if media_path:
+        clear_media_token_cache(media_path)
+
+
+def get_media_signature(media_path):
+    try:
+        stat = os.stat(media_path)
+        return (stat.st_mtime_ns, stat.st_size)
+    except OSError:
+        return None
+
+
+def clear_media_token_cache(media_path):
+    cached = MEDIA_TOKEN_CACHE.pop(media_path, None)
+    if cached:
+        token = cached.get("token")
+        if token in MEDIA_CACHE:
+            del MEDIA_CACHE[token]
+
+
+def get_media_token(media_path, cate):
+    sig = get_media_signature(media_path)
+    if not sig:
+        return None
+
+    cached = MEDIA_TOKEN_CACHE.get(media_path)
+    if cached and cached.get("sig") == sig:
+        token = cached.get("token")
+        if token in MEDIA_CACHE:
+            MEDIA_CACHE[token]["created_at"] = time.time()
+            return token
+
+    if cached:
+        token = cached.get("token")
+        if token in MEDIA_CACHE:
+            del MEDIA_CACHE[token]
+
+    token = str(uuid.uuid4())
+    MEDIA_CACHE[token] = {
+        "path": media_path,
+        "cate": cate,
+        "sig": sig,
+        "created_at": time.time()
+    }
+    MEDIA_TOKEN_CACHE[media_path] = {
+        "token": token,
+        "sig": sig,
+    }
+    return token
 
 
 def get_media_path(model_file: str, dirname: str=None):
@@ -160,6 +226,79 @@ def get_media_category(media_path):
     return None
 
 
+def preserve_png_info(image):
+    pnginfo = PngImagePlugin.PngInfo()
+    has_info = False
+
+    for key, value in image.info.items():
+        if key in {"interlace", "gamma", "dpi", "transparency", "aspect"}:
+            continue
+
+        try:
+            if isinstance(value, str):
+                pnginfo.add_text(key, value)
+                has_info = True
+            elif isinstance(value, bytes):
+                pnginfo.add_text(key, value.decode("utf-8", errors="replace"))
+                has_info = True
+        except Exception as e:
+            print(f"PNGメタデータ保持失敗: {key}: {e}")
+
+    return pnginfo if has_info else None
+
+
+def get_image_save_options(image, ext):
+    info = image.info or {}
+    options = {}
+
+    if "exif" in info:
+        options["exif"] = info["exif"]
+    if "icc_profile" in info:
+        options["icc_profile"] = info["icc_profile"]
+    if "xmp" in info:
+        options["xmp"] = info["xmp"]
+    if "comment" in info:
+        options["comment"] = info["comment"]
+    if "dpi" in info:
+        options["dpi"] = info["dpi"]
+
+    if ext == ".png":
+        pnginfo = preserve_png_info(image)
+        if pnginfo:
+            options["pnginfo"] = pnginfo
+    elif ext in {".jpg", ".jpeg"}:
+        options["quality"] = 90
+        options["optimize"] = True
+    elif ext == ".webp":
+        options["quality"] = 90
+        options["method"] = 6
+
+    return options
+
+
+def save_thumbnail_image(image_bytes, save_path):
+    with Image.open(BytesIO(image_bytes)) as image:
+        if getattr(image, "is_animated", False):
+            print("アニメーション画像のためサムネイル化せず保存します")
+            return False
+
+        ext = os.path.splitext(save_path)[1].lower()
+        save_options = get_image_save_options(image, ext)
+
+        resized = image.copy()
+        resized.thumbnail((THUMBNAIL_MAX_SIZE, THUMBNAIL_MAX_SIZE), RESAMPLE_LANCZOS)
+
+        if resized.size == image.size:
+            return False
+
+        if ext in {".jpg", ".jpeg"} and resized.mode not in {"RGB", "L"}:
+            resized = resized.convert("RGB")
+
+        resized.save(save_path, **save_options)
+        print(f"サムネイル保存: {save_path} size={image.size}->{resized.size}")
+        return True
+
+
 
 # ===============================================
 # エンドポイント
@@ -185,12 +324,9 @@ async def get_media_data(req: web.Request):
             return web.json_response(res)
         
         cate = get_media_category(media_path)
-        token = str(uuid.uuid4())
-        MEDIA_CACHE[token] = {
-            "path": media_path, 
-            "cate": cate, 
-            "created_at": time.time()
-        }
+        token = get_media_token(media_path, cate)
+        if not token:
+            return web.json_response(res)
         
         res["path"] = media_path
         res["cate"] = cate
@@ -227,7 +363,11 @@ async def serve_media(req: web.Request):
         else:
             mime_type = "application/actet-stream"
     
-    headers = {"Content-Type": mime_type}
+    headers = {
+        "Content-Type": mime_type,
+        "Cache-Control": "public, max-age=3600, immutable",
+        "ETag": f'"{token}"',
+    }
     if encoding:
         headers["Content-Encoding"] = encoding
     
@@ -294,6 +434,7 @@ async def download_media(req: web.Request):
     filename = data.get("file")
     url = data.get("url")
     media_type = data.get("type", "").lower()
+    use_thumbnail = data.get("thumbnail", False)
 
     clear_path_cache(dirname, filename)
 
@@ -316,13 +457,25 @@ async def download_media(req: web.Request):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
             response.raise_for_status()
-            total_size= int(response.headers.get("content-length") or 0)
-            pbar = tqdm(total=total_size, unit="B", unit_scale=True)
-            async with aiofiles.open(save_path, "wb") as f:
-                with pbar:
-                    async for chunk in response.content.iter_chunked(CHUNK_SIZE):
-                        await f.write(chunk)
-                        pbar.update(len(chunk))
+            if use_thumbnail and media_type == "image":
+                image_bytes = await response.read()
+                try:
+                    saved_thumbnail = save_thumbnail_image(image_bytes, save_path)
+                except Exception as e:
+                    print(f"サムネイル保存失敗。元画像を保存します: {e}")
+                    saved_thumbnail = False
+
+                if not saved_thumbnail:
+                    async with aiofiles.open(save_path, "wb") as f:
+                        await f.write(image_bytes)
+            else:
+                total_size= int(response.headers.get("content-length") or 0)
+                pbar = tqdm(total=total_size, unit="B", unit_scale=True)
+                async with aiofiles.open(save_path, "wb") as f:
+                    with pbar:
+                        async for chunk in response.content.iter_chunked(CHUNK_SIZE):
+                            await f.write(chunk)
+                            pbar.update(len(chunk))
     
     return web.json_response("ok")
 

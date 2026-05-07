@@ -37,7 +37,9 @@ export class MediaManager {
                     mediaElement = $el("img", {
                         src: src, 
                         alt: filePath, 
-                        loading: "lazy"
+                        loading: "lazy",
+                        decoding: "async",
+                        fetchPriority: "low",
                     });
                     break;
                 case "video":
@@ -93,12 +95,13 @@ export class MediaManager {
     // メディアファイルをダウンロード
     //  mediaType: image / video / audio
     // ------------------------------------------
-    async downloadMediaFile({ dirName, filePath, url, mediaType }) {
+    async downloadMediaFile({ dirName, filePath, url, mediaType, thumbnail = false }) {
         await apiPost(this.packageName, "download_media", {
             dir: dirName, 
             file: filePath, 
             url: url, 
-            type: mediaType
+            type: mediaType,
+            thumbnail: thumbnail,
         });
     }
 }

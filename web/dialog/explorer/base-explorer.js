@@ -8,6 +8,7 @@ import { SearchManager } from "./managers/search-manager.js";
 import { TreeManager } from "./managers/tree-manager.js";
 import { DirsManager } from "./managers/dirs-manager.js";
 import { FilesManager } from "./managers/files-manager.js";
+import { FilesManagerVirtual } from "./managers/files-manager-virtual.js";
 import { BaseExplorerConfig } from "./base-explroer-config.js";
 
 loadCss("dialog/explorer/base-explorer.css");
@@ -38,7 +39,30 @@ export class BaseExplorer extends BaseModal {
         this.searchManager = new SearchManager(this);
         this.treeManager = new TreeManager(this);
         this.dirsManager = new DirsManager(this);
-        this.filesManager = new FilesManager(this);
+        this.filesManager = this.createFilesManager();
+    }
+
+    createFilesManager() {
+        return this.getConfig("useVirtualScroll")
+            ? new FilesManagerVirtual(this)
+            : new FilesManager(this);
+    }
+
+    async recreateFilesManager() {
+        const oldElement = this.filesManager?.element;
+        this.filesManager?.destroy?.();
+        this.filesManager = this.createFilesManager();
+
+        if (oldElement?.parentElement) {
+            oldElement.replaceWith(this.filesManager.element);
+        } else {
+            this.viewContainer?.prepend(this.filesManager.element);
+        }
+
+        const currentNode = this.dataManager?.findDir?.(this.currentDir);
+        if (currentNode) {
+            await this.filesManager.display(currentNode);
+        }
     }
 
     // ------------------------------------------
@@ -78,12 +102,12 @@ export class BaseExplorer extends BaseModal {
 
         // Main Area
         const mainArea = $el("div.jupo-explorer-main-area");
-        const viewContainer = $el("div.jupo-explorer-view", [
+        this.viewContainer = $el("div.jupo-explorer-view", [
             this.dirsManager.element, 
             this.filesManager.element, 
             this.searchManager.resultsContainer, 
         ]);
-        mainArea.append(this.treeManager.element, viewContainer);
+        mainArea.append(this.treeManager.element, this.viewContainer);
         
         this.content.append(mainArea);
     }

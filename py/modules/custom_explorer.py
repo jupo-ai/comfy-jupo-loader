@@ -8,6 +8,33 @@ import subprocess
 import platform
 
 PACKAGE_NAME = "CustomExplorer"
+INFO_CACHE = {}
+
+
+def get_cached_info(json_path: Path):
+    try:
+        stat = json_path.stat()
+    except FileNotFoundError:
+        return {}, False, False
+
+    cache_key = str(json_path)
+    cache_sig = (stat.st_mtime_ns, stat.st_size)
+    cached = INFO_CACHE.get(cache_key)
+    if cached and cached["sig"] == cache_sig:
+        return cached["info"], True, True
+
+    try:
+        with open(json_path, mode="r", encoding="utf-8") as f:
+            info = json.load(f)
+    except Exception as e:
+        print(f"❌ JSON読み込み失敗: {json_path}: {e}")
+        info = {}
+
+    INFO_CACHE[cache_key] = {
+        "sig": cache_sig,
+        "info": info,
+    }
+    return info, True, False
 
 # ===============================================
 # エンドポイント
@@ -75,15 +102,9 @@ async def get_data_list(req: web.Request):
     data_list = []
 
     for filename in file_list:
-        info = {}
         full_path = folder_paths.get_full_path(dirname, filename)
         json_path = Path(full_path).with_suffix(".json")
-        if json_path.exists():
-            try:
-                with open(json_path, mode="r", encoding="utf-8") as f:
-                    info = json.load(f)
-            except Exception as e:
-                print(f"❌ JSON読み込み失敗: {json_path}: {e}")
+        info, _, _ = get_cached_info(json_path)
         
         data = {
             "filename": filename, 

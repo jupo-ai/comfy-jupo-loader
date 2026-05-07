@@ -292,6 +292,15 @@ Base Explorer
     gap: 20px;
 }
 
+.jupo-explorer-files-items--virtual {
+    position: relative;
+    display: block;
+    flex-wrap: initial;
+    gap: 0;
+    padding-left: 0;
+    padding-top: 0;
+}
+
 /* --- ファイルアイテム --- */
 .jupo-explorer-files-item {
     position: relative;

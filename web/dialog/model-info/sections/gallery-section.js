@@ -1,6 +1,8 @@
 import { $el } from "../../../../../scripts/ui.js";
+import { app } from "../../../../../scripts/app.js";
 import { MediaManager } from "../../../modules/media-manager.js";
 import { BaseModal } from "../../base/base-dialog.js";
+import { mkName } from "../../../utils.js";
 
 // ==============================================
 // Gallery Section
@@ -57,7 +59,8 @@ export class GallerySection {
                         dirName: this.parent.apiDir, 
                         filePath: this.parent.modelPath, 
                         url: image.url, 
-                        mediaType: isVideo ? "video" : "image"
+                        mediaType: isVideo ? "video" : "image",
+                        thumbnail: !isVideo && this.getSavePreviewAsThumbnailConfig(),
                     });
                     await this.parent.previewSection?.refresh();
                 }
@@ -105,6 +108,25 @@ export class GallerySection {
 
     updateCount(count) {
         this.counter.textContent = count.toString();
+    }
+
+    getSavePreviewAsThumbnailConfig() {
+        const explorerName = this.getExplorerName();
+        if (!explorerName) return false;
+
+        const id = mkName("CustomExplorer", explorerName, "savePreviewAsThumbnail");
+        return app.extensionManager.setting.get(id) === true;
+    }
+
+    getExplorerName() {
+        switch (this.parent.apiDir) {
+            case "loras":
+                return "LoraExplorer";
+            case "input":
+                return "ImageExplorer";
+            default:
+                return "ResourceExplorer";
+        }
     }
 
     // ------------------------------------------
