@@ -99,6 +99,7 @@ export class SelectorWidget {
     handleDragStart(e) {
         if (e.button === 0) {
             e.preventDefault();
+            e.stopPropagation();
             this.parentField.startDragging(this);
         }
     }

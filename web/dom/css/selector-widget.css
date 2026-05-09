@@ -75,7 +75,7 @@ Selector Widget
 .jupo-selector-widget-drag-handle {
     order: -1;
     color: var(--text-secondary);
-    pointer-events: auto;
+    pointer-events: auto !important;
     opacity: 0.5;
 }
 .jupo-selector-widget-drag-handle:hover {
