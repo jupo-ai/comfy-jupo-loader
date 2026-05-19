@@ -6,11 +6,32 @@ from .utils import get_available_stack, get_trigger_from_stack
 from comfy.model_patcher import ModelPatcher
 from comfy.sd import CLIP
 import comfy.hooks
+import json
 from .lbw import LBWLoraLoader
 
 # カスタムIO
 IO_LORASTACK = io.Custom("LORASTACK")
 IO_OPTIMIZER_STACK = io.Custom("LORA_STACK")
+
+
+def _options_input():
+    return io.String.Input("options", socketless=True, extra_dict={"hidden": True}, default="", optional=True)
+
+
+def _get_trigger_position(options: str) -> str:
+    try:
+        options_dict = json.loads(options) if options else {}
+    except Exception:
+        options_dict = {}
+
+    position = options_dict.get("triggerPosition", "after")
+    return "before" if position == "before" else "after"
+
+
+def _combine_trigger(prev_text: str, trigger: str, options: str) -> str:
+    if _get_trigger_position(options) == "before":
+        return trigger + prev_text
+    return prev_text + trigger
 
 
 # ===============================================
@@ -25,22 +46,23 @@ class LoraStack(io.ComfyNode):
             category=CATEGORY, 
             inputs=[
                 io.String.Input("values", socketless=True, extra_dict={"hidden": True}), 
+                _options_input(),
                 IO_LORASTACK.Input("prev_stack", optional=True), 
                 io.String.Input("prev_text", force_input=True, optional=True), 
             ], 
             outputs=[
                 IO_LORASTACK.Output(display_name="stack"), 
-                io.String.Output(display_name="trigger"), 
+                io.String.Output(display_name="text"), 
             ]
         )
     
     @classmethod
-    def execute(cls, values: str, prev_stack: list[dict]=[], prev_text: str=""):
+    def execute(cls, values: str, options: str="", prev_stack: list[dict]=[], prev_text: str=""):
         stack = get_available_stack(values, "loras")
         trigger = get_trigger_from_stack(stack)
 
         new_stack = prev_stack + stack
-        new_trigger = prev_text + trigger
+        new_trigger = _combine_trigger(prev_text, trigger, options)
         
 
         return io.NodeOutput(new_stack, new_trigger)
@@ -154,6 +176,7 @@ class LoraLoader(io.ComfyNode):
             category=CATEGORY, 
             inputs=[
                 io.String.Input("values", socketless=True, extra_dict={"hidden": True}), 
+                _options_input(),
                 io.Model.Input("model"), 
                 io.Clip.Input("clip", optional=True), 
                 io.String.Input("prev_text", force_input=True, optional=True), 
@@ -161,15 +184,15 @@ class LoraLoader(io.ComfyNode):
             outputs=[
                 io.Model.Output(), 
                 io.Clip.Output(), 
-                io.String.Output(display_name="trigger"), 
+                io.String.Output(display_name="text"), 
             ], 
         )
     
     @classmethod
-    def execute(cls, values: str, model: ModelPatcher, clip: CLIP=None, prev_text: str=""):
+    def execute(cls, values: str, options: str="", model: ModelPatcher=None, clip: CLIP=None, prev_text: str=""):
         stack, trigger = LoraStack().execute(values)
         model, clip = ApplyLoraStack().execute(model, clip, stack)
-        new_text = prev_text + trigger
+        new_text = _combine_trigger(prev_text, trigger, options)
 
         return io.NodeOutput(model, clip, new_text)
     

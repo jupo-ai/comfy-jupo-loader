@@ -12,6 +12,7 @@ Comfy Jupo Loader は、ComfyUI のモデル・画像・プリミティブ値の
 - 複数候補を保持して有効な1件を選べる Selector ノード
 - Nodes 2.0 での hidden values とファイル選択 UI の挙動に対応
 - プレビュー付き Image Loader
+- ディレクトリ内画像を1枚ずつ自動ジョブ展開する Directory Image Loader
 - 数値と複数行文字列の Primitive Selector
 
 ## インストール
@@ -93,6 +94,25 @@ Schedule 機能には重大な不具合があるため、現在 Schedule UI は�
 
 `Image Loader` は ComfyUI の input フォルダとそのサブフォルダ内の画像を読み込みます。旧 UI と Nodes 2.0 のどちらでも独自エクスプローラを開きます。サブフォルダ内画像でも MaskEditor が扱えるように、画像パスの正規化も行います。
 
+#### Directory Image Loader
+
+`Directory Image Loader` は、指定したディレクトリ内の画像を対象に、1回の Queue 操作で画像枚数ぶんのジョブを自動展開する画像読み込みノードです。
+
+入力は以下です。
+
+- `directory`: 読み込む画像ディレクトリ
+- `extensions`: 対象にする画像拡張子。例: `png,jpg,jpeg,webp`
+- `include_subdirectories`: サブディレクトリ内の画像も対象にするか
+
+出力は以下です。
+
+- `image`
+- `mask`
+
+ノード上の `Select Directory` ボタンから Windows 標準のフォルダ選択ダイアログを開き、選択したディレクトリを `directory` に反映できます。ノードには対象画像数も `Images: 12` のように表示されます。
+
+Queue 時には web 拡張が対象画像数を取得し、内部の `index` を `0, 1, 2...` と差し替えたプロンプトを自動投入します。通常は ComfyUI の `Batch count` を `1` にして使ってください。`Batch count` を増やすと、画像枚数に対してさらにその回数ぶん投入されます。
+
 ### Primitive
 
 ![Primitive Nodes](assets/nodes_primitive.png)
@@ -135,4 +155,3 @@ aiofiles
 ```
 
 `aiohttp`、`numpy`、`Pillow`、`torch`、`tqdm`、`blake3` など、ComfyUI 標準の `requirements.txt` に含まれるものは重複して記載していません。
-
