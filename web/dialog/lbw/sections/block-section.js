@@ -19,6 +19,14 @@ export class BlockSection {
         this.element = $el("div.jupo-block-section");
     }
 
+    getSearchKeys(info) {
+        return Array.isArray(info[0]) ? info[0] : [info[0]];
+    }
+
+    getLabelTitle(info) {
+        return this.getSearchKeys(info).map(key => `${key}*`).join("\n");
+    }
+
     // ------------------------------------------
     // ユーティリティ
     // ------------------------------------------
@@ -38,7 +46,7 @@ export class BlockSection {
                 config[position].forEach(info => {
                     const slider = new Slider({
                         label: info[1], 
-                        labelTitle: info[3] ?? info[0], 
+                        labelTitle: this.getLabelTitle(info), 
                         value: options.value, 
                         min: options.min, 
                         max: options.max, 
@@ -69,7 +77,7 @@ export class BlockSection {
     // ------------------------------------------
     applyValue(key, value) {
         // keyを持つsliderを取得
-        const item = this.sliders.find(i => i.info[0] === key);
+        const item = this.sliders.find(i => this.getSearchKeys(i.info).includes(key));
         if (!item) return;
 
         item.slider.value = value;
@@ -84,14 +92,16 @@ export class BlockSection {
 
         this.sliders.forEach(item => {
             const { info, slider } = item;
-            const key = info[0];
+            const keys = this.getSearchKeys(info);
             const blockType = info[2];
             const value = slider.value;
 
             if (!lbw[blockType]) {
                 lbw[blockType] = {};
             }
-            lbw[blockType][key] = value;
+            keys.forEach(key => {
+                lbw[blockType][key] = value;
+            });
         });
 
         return lbw;

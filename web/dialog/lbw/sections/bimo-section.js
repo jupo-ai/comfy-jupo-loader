@@ -55,6 +55,8 @@ export class BimoSection {
         const mapping = {};
 
         // 各文字他オプを処理する関数
+        const blockSection = this.parent.blockSection;
+
         function processCharType(charPattern, configKey) {
             const chars = bimo.match(charPattern) || [];
             if (chars.length > 0 && blockConfig[configKey]) {
@@ -69,8 +71,10 @@ export class BimoSection {
                     
                     for (let i = 0; i < itemsForThisChar; i++) {
                         if (currentIndex < items.length) {
-                            const key = items[currentIndex][0];
-                            mapping[key] = value;
+                            const keys = blockSection.getSearchKeys(items[currentIndex]);
+                            keys.forEach(key => {
+                                mapping[key] = value;
+                            });
                             currentIndex++;
                         }
                     }
