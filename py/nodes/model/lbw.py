@@ -210,6 +210,14 @@ class LBWLoraLoader:
         if not isinstance(internal_key, str):
             return False
 
+        if search_key == "__anima_base__":
+            return internal_key.startswith((
+                "diffusion_model.t_embedder.",
+                "diffusion_model.x_embedder.",
+                "diffusion_model.final_layer.",
+                "diffusion_model.t_embedding_norm.",
+            ))
+
         start = internal_key.find(search_key)
         if start < 0:
             return False

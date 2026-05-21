@@ -38,7 +38,7 @@ export class BlockSection {
                 config[position].forEach(info => {
                     const slider = new Slider({
                         label: info[1], 
-                        labelTitle: info[0], 
+                        labelTitle: info[3] ?? info[0], 
                         value: options.value, 
                         min: options.min, 
                         max: options.max, 

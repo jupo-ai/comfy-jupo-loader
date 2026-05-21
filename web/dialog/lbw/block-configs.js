@@ -19,10 +19,17 @@ function createSliderInfo(keyPrefix, namePrefix, start, end, type) {
     return result;
 }
 
+const ANIMA_BASE_SEARCH_KEYS = [
+    "diffusion_model.t_embedder.",
+    "diffusion_model.x_embedder.",
+    "diffusion_model.final_layer.",
+    "diffusion_model.t_embedding_norm.",
+].join("\n");
+
 export const BlockConfigs = {
     SD: {
         upper: [
-            ["transformer.text_model.encoder.", "BASE", "clip"]
+            ["transformer.text_model.encoder.", "TE", "clip"]
         ], 
         bottom: [
             ["middle_block.", "MIDDLE", "model"]
@@ -37,8 +44,12 @@ export const BlockConfigs = {
     }, 
 
     Anima: {
-        left: createSliderInfo("blocks", "BLOCK", 0, 13, "model"), 
-        right: createSliderInfo("blocks", "BLOCK", 14, 27, "model")
+        upper: [
+            ["__anima_base__", "BASE", "model", ANIMA_BASE_SEARCH_KEYS],
+            ["diffusion_model.llm_adapter", "LLM Adapter", "model"],
+        ],
+        left: createSliderInfo("diffusion_model.blocks", "BLOCK", 0, 13, "model"), 
+        right: createSliderInfo("diffusion_model.blocks", "BLOCK", 14, 27, "model")
     },
 
     ZImage: {
