@@ -158,7 +158,7 @@ def get_image_paths(directory, extensions, include_subdirectories=False):
 
     paths = dir_path.rglob("*") if include_subdirectories else dir_path.glob("*")
     files = [p for p in paths if p.is_file() and _matches_extension(p, parsed_extensions)]
-    return sorted(files, key=lambda p: p.as_posix().lower())
+    return sorted(files, key=lambda p: (p.name.lower(), p.as_posix().lower()))
 
 
 def _matches_extension(path, extensions):
